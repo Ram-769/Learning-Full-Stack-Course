@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 — Node.js Fundamentals | 30-Day Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="dark"] {
+  --bg: #0d0f14;
+  --bg2: #13161e;
+  --bg3: #1a1e2a;
+  --bg4: #222636;
+  --border: #2a2e3f;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --green-glow: rgba(34,197,94,0.3);
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --accent-dim: rgba(99,102,241,0.12);
+  --yellow: #f59e0b;
+  --yellow-dim: rgba(245,158,11,0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --cyan: #06b6d4;
+  --cyan-dim: rgba(6,182,212,0.12);
+  --node-green: #68a063;
+}
+:root[data-theme="light"] {
+  --bg: #f1f5f9;
+  --bg2: #ffffff;
+  --bg3: #f8fafc;
+  --bg4: #e2e8f0;
+  --border: #cbd5e1;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --green: #16a34a;
+  --green-dim: rgba(22,163,74,0.1);
+  --green-glow: rgba(22,163,74,0.25);
+  --accent: #4f46e5;
+  --accent2: #6366f1;
+  --accent-dim: rgba(79,70,229,0.1);
+  --yellow: #d97706;
+  --yellow-dim: rgba(217,119,6,0.1);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.1);
+  --cyan: #0891b2;
+  --cyan-dim: rgba(8,145,178,0.1);
+  --node-green: #3d7a38;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--node-green), #4ade80);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 13px; color: #fff;
+}
+.logo-text { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+.logo-text span { color: var(--green); }
+
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+}
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-size: 13px; width: 100%; font-family: 'Inter', sans-serif;
+}
+.search-box input::placeholder { color: var(--text3); }
+.search-icon { color: var(--text3); font-size: 14px; }
+
+.progress-card {
+  margin: 14px 16px;
+  background: var(--green-dim);
+  border: 1px solid var(--green-glow);
+  border-radius: 10px;
+  padding: 12px;
+}
+.progress-label { font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 8px; }
+.progress-bar-wrap { background: var(--bg4); border-radius: 100px; height: 6px; margin-bottom: 6px; }
+.progress-bar { height: 6px; border-radius: 100px; background: linear-gradient(90deg, var(--green), #4ade80); width: 3.33%; transition: width 0.4s; }
+.progress-text { font-size: 12px; color: var(--text2); display: flex; justify-content: space-between; }
+
+.section-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text3); font-weight: 600;
+  padding: 14px 16px 6px;
+}
+
+.day-list { list-style: none; padding: 0 8px 8px; }
+.day-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  cursor: pointer; transition: background 0.15s;
+  font-size: 13px; color: var(--text2);
+}
+.day-item:hover { background: var(--bg3); }
+.day-item.active {
+  background: var(--accent-dim);
+  color: var(--accent2);
+  font-weight: 600;
+}
+.day-item.done { color: var(--green); }
+.day-badge {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+  background: var(--bg4);
+  color: var(--text3);
+}
+.day-item.active .day-badge { background: var(--accent); color: #fff; }
+.day-item.done .day-badge { background: var(--green-dim); color: var(--green); }
+.locked-days { padding: 0 8px 16px; }
+.locked-label { font-size: 11px; color: var(--text3); padding: 4px 10px; }
+
+/* ===== TOPBAR ===== */
+.main-wrap { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 90;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 56px;
+  gap: 16px;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.breadcrumb { font-size: 13px; color: var(--text3); }
+.breadcrumb span { color: var(--text2); }
+.breadcrumb strong { color: var(--green); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 7px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg3); color: var(--text2);
+  transition: all 0.15s; font-family: 'Inter', sans-serif;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent2); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.btn-green { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+.theme-toggle {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: all 0.15s;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+/* ===== CONTENT ===== */
+.content { flex: 1; padding: 32px 28px 80px; max-width: 900px; }
+
+.day-hero {
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 32px;
+  position: relative; overflow: hidden;
+}
+.day-hero::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, var(--green-glow), transparent 70%);
+  pointer-events: none;
+}
+.day-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-dim); border: 1px solid var(--green);
+  color: var(--green); border-radius: 100px;
+  padding: 4px 12px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;
+}
+.day-hero h1 { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.day-hero h1 span { color: var(--green); }
+.day-hero p { color: var(--text2); font-size: 15px; max-width: 580px; margin-bottom: 20px; }
+.hero-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+.hero-meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text3); }
+.hero-meta-item strong { color: var(--text2); }
+
+/* Section */
+.section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.section-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.section-head:hover { background: var(--bg3); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent-dim); color: var(--accent2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0;
+}
+.section-title { font-weight: 600; font-size: 15px; flex: 1; }
+.section-chevron { color: var(--text3); transition: transform 0.2s; font-size: 14px; }
+.section.open .section-chevron { transform: rotate(180deg); }
+.section-body { padding: 24px; display: none; }
+.section.open .section-body { display: block; }
+
+h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--text); }
+h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+p { color: var(--text2); margin-bottom: 12px; }
+ul, ol { color: var(--text2); padding-left: 18px; margin-bottom: 12px; }
+li { margin-bottom: 6px; }
+
+/* Diagram */
+.diagram {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  margin: 16px 0;
+  text-align: center;
+  color: var(--text2);
+  line-height: 2;
+}
+.diagram .node {
+  display: inline-block;
+  background: var(--bg4);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 20px;
+  margin: 3px;
+  color: var(--text);
+  font-size: 12px;
+}
+.diagram .node.green { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.diagram .node.purple { background: var(--accent-dim); border-color: var(--accent); color: var(--accent2); }
+.diagram .node.yellow { background: var(--yellow-dim); border-color: var(--yellow); color: var(--yellow); }
+.diagram .node.cyan { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
+.diagram .arrow { color: var(--text3); display: block; margin: 0; }
+
+/* Code block */
+.code-block {
+  background: #0a0c12;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+:root[data-theme="light"] .code-block { background: #1e1e2e; }
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-lang { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 600; }
+.code-copy { font-size: 11px; color: var(--text3); cursor: pointer; }
+.code-copy:hover { color: var(--accent2); }
+pre {
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: #e2e8f0;
+  margin: 0;
+}
+.kw { color: #c792ea; }
+.fn { color: #82aaff; }
+.str { color: #c3e88d; }
+.cm { color: #546e7a; font-style: italic; }
+.num { color: #f78c6c; }
+.op { color: #89ddff; }
+.var { color: #eeffff; }
+
+/* Cards */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 16px 0; }
+.card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.card.green-card { border-left: 3px solid var(--green); }
+.card.purple-card { border-left: 3px solid var(--accent); }
+.card.yellow-card { border-left: 3px solid var(--yellow); }
+.card.red-card { border-left: 3px solid var(--red); }
+.card.cyan-card { border-left: 3px solid var(--cyan); }
+.card-icon { font-size: 22px; margin-bottom: 8px; }
+.card-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* Table */
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  background: var(--bg3); padding: 10px 14px;
+  text-align: left; color: var(--text2);
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg3); }
+.tag-yes { color: var(--green); font-weight: 600; }
+.tag-no { color: var(--red); font-weight: 600; }
+
+/* Callout */
+.callout {
+  border-radius: 10px; padding: 14px 16px; margin: 14px 0;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.callout.info { background: var(--accent-dim); border: 1px solid var(--accent); }
+.callout.success { background: var(--green-dim); border: 1px solid var(--green); }
+.callout.warning { background: var(--yellow-dim); border: 1px solid var(--yellow); }
+.callout.error { background: var(--red-dim); border: 1px solid var(--red); }
+.callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.callout-text strong { color: var(--text); }
+
+/* Quiz */
+.quiz-q {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin-bottom: 14px;
+}
+.quiz-q-text { font-weight: 600; font-size: 14px; margin-bottom: 12px; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg4);
+  cursor: pointer; font-size: 13px; color: var(--text2);
+  transition: all 0.15s;
+}
+.quiz-option:hover { border-color: var(--accent); color: var(--accent2); }
+.quiz-option.correct { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+.quiz-option.wrong { border-color: var(--red); background: var(--red-dim); color: var(--red); }
+.quiz-opt-key {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.quiz-explain { display: none; margin-top: 10px; padding: 10px 12px; background: var(--green-dim); border-radius: 8px; font-size: 13px; color: var(--green); }
+
+/* Interview Q */
+.iq-item {
+  border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 12px; overflow: hidden;
+}
+.iq-question {
+  padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px;
+  cursor: pointer; background: var(--bg3); font-size: 14px; font-weight: 500;
+  transition: background 0.15s;
+}
+.iq-question:hover { background: var(--bg4); }
+.iq-q-num {
+  background: var(--accent-dim); color: var(--accent2);
+  border-radius: 6px; padding: 2px 7px; font-size: 11px;
+  font-weight: 700; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; margin-top: 2px;
+}
+.iq-answer { display: none; padding: 14px 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); }
+.iq-answer.show { display: block; }
+.iq-answer-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); font-weight: 700; margin-bottom: 6px; }
+
+/* Analogy */
+.analogy {
+  background: var(--yellow-dim); border: 1px solid var(--yellow);
+  border-radius: 10px; padding: 16px; margin: 16px 0;
+}
+.analogy-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--yellow); font-weight: 700; margin-bottom: 8px; }
+.analogy-body { font-size: 13px; color: var(--text2); }
+
+/* Mistake / Tip */
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+.tip-card { background: var(--bg3); border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
+.tip-bad { border-top: 3px solid var(--red); }
+.tip-good { border-top: 3px solid var(--green); }
+.tip-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+.tip-bad .tip-header { color: var(--red); }
+.tip-good .tip-header { color: var(--green); }
+.tip-item { font-size: 12px; color: var(--text2); margin-bottom: 6px; padding-left: 14px; position: relative; }
+.tip-item::before { position: absolute; left: 0; }
+.tip-bad .tip-item::before { content: "✗"; color: var(--red); }
+.tip-good .tip-item::before { content: "✓"; color: var(--green); }
+
+/* Exercise */
+.exercise {
+  background: var(--accent-dim); border: 1px solid var(--accent);
+  border-radius: 10px; padding: 16px; margin-bottom: 12px;
+}
+.exercise-num { font-size: 11px; color: var(--accent2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+.exercise-text { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.exercise-desc { font-size: 13px; color: var(--text2); }
+
+/* Roadmap */
+.roadmap-step {
+  display: flex; align-items: flex-start; gap: 16px; margin-bottom: 0;
+}
+.roadmap-line { display: flex; flex-direction: column; align-items: center; }
+.roadmap-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--green); background: var(--green);
+  flex-shrink: 0; margin-top: 4px;
+}
+.roadmap-dot.dim { background: var(--bg4); border-color: var(--border); }
+.roadmap-connector { width: 2px; flex: 1; min-height: 24px; background: var(--border); }
+.roadmap-step:last-child .roadmap-connector { display: none; }
+.roadmap-content { padding-bottom: 20px; flex: 1; }
+.roadmap-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.roadmap-desc { font-size: 12px; color: var(--text3); }
+
+/* Chip badges */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 11px; font-weight: 600; margin: 3px 3px 3px 0;
+}
+.chip-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+.chip-purple { background: var(--accent-dim); color: var(--accent2); border: 1px solid rgba(99,102,241,0.3); }
+.chip-yellow { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+.chip-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+/* Companies */
+.company-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
+.company-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; text-align: center;
+}
+.company-logo { font-size: 26px; margin-bottom: 6px; }
+.company-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.company-why { font-size: 11px; color: var(--text3); line-height: 1.5; }
+
+/* Next day banner */
+.next-day {
+  background: linear-gradient(135deg, var(--accent-dim), var(--bg3));
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-top: 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.next-day-text h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.next-day-text p { font-size: 13px; color: var(--text2); margin: 0; }
+.next-day-topics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+/* Notes */
+.notes-area {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin: 14px 0;
+}
+.notes-area textarea {
+  width: 100%; background: none; border: none; outline: none;
+  color: var(--text2); font-family: 'Inter', sans-serif; font-size: 13px;
+  line-height: 1.7; resize: vertical; min-height: 100px;
+}
+
+/* Sticky note */
+.sticky-note {
+  background: #fef3c7; color: #92400e;
+  border-radius: 4px 4px 4px 0;
+  padding: 12px 14px; margin: 14px 0;
+  font-size: 13px; position: relative;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+}
+:root[data-theme="dark"] .sticky-note { background: rgba(251,191,36,0.12); color: #fbbf24; }
+
+/* Divider */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* Flow step */
+.flow-steps { counter-reset: flow; }
+.flow-step {
+  display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start;
+}
+.flow-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-dim); border: 2px solid var(--accent);
+  color: var(--accent2); font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-family: 'JetBrains Mono', monospace;
+}
+.flow-step-content { flex: 1; }
+.flow-step-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.flow-step-desc { font-size: 13px; color: var(--text2); }
+
+/* Footer in content */
+.content-footer { text-align: center; color: var(--text3); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .content { padding: 20px 16px 60px; }
+  .tips-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">JS</div>
+      <div class="logo-text">Node<span>.js</span> Mastery</div>
+    </div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search topics...">
+    </div>
+  </div>
+
+  <div class="progress-card">
+    <div class="progress-label">📈 Your Progress</div>
+    <div class="progress-bar-wrap"><div class="progress-bar"></div></div>
+    <div class="progress-text"><span>Day 1 of 30</span><span>3.3% complete</span></div>
+  </div>
+
+  <div class="section-label">Week 1 — Node.js Foundation</div>
+  <ul class="day-list">
+    <li class="day-item active">
+      <div class="day-badge">1</div>
+      Node.js Fundamentals
+    </li>
+    <li class="day-item">
+      <div class="day-badge">2</div>
+      Event Loop Deep Dive
+    </li>
+    <li class="day-item">
+      <div class="day-badge">3</div>
+      Modules (CommonJS / ESM)
+    </li>
+    <li class="day-item">
+      <div class="day-badge">4</div>
+      NPM Ecosystem
+    </li>
+    <li class="day-item">
+      <div class="day-badge">5</div>
+      File System Module
+    </li>
+    <li class="day-item">
+      <div class="day-badge">6</div>
+      Async Programming
+    </li>
+    <li class="day-item">
+      <div class="day-badge">7</div>
+      Mini Project: CRUD API
+    </li>
+  </ul>
+
+  <div class="section-label">Week 2 — MongoDB Mastery</div>
+  <ul class="day-list">
+    <li class="day-item"><div class="day-badge">8</div> MongoDB Basics</li>
+    <li class="day-item"><div class="day-badge">9</div> CRUD Operations</li>
+    <li class="day-item"><div class="day-badge">10</div> Data Types</li>
+    <li class="day-item"><div class="day-badge">11</div> Schema Design</li>
+    <li class="day-item"><div class="day-badge">12</div> Indexes</li>
+    <li class="day-item"><div class="day-badge">13</div> Relationships</li>
+    <li class="day-item"><div class="day-badge">14</div> Library Project</li>
+  </ul>
+
+  <div class="section-label">Week 3 — Architecture</div>
+  <ul class="day-list">
+    <li class="day-item"><div class="day-badge">15</div> Express.js Setup</li>
+    <li class="day-item"><div class="day-badge">16</div> Folder Structure</li>
+    <li class="day-item"><div class="day-badge">17</div> Reusable Architecture</li>
+    <li class="day-item"><div class="day-badge">18</div> Response Structure</li>
+    <li class="day-item"><div class="day-badge">19</div> Validation Layer</li>
+    <li class="day-item"><div class="day-badge">20</div> Error Handling</li>
+    <li class="day-item"><div class="day-badge">21</div> Authentication / JWT</li>
+  </ul>
+
+  <div class="section-label">Week 4 — Advanced + Interviews</div>
+  <ul class="day-list">
+    <li class="day-item"><div class="day-badge">22</div> Aggregation Intro</li>
+    <li class="day-item"><div class="day-badge">23</div> Aggregation Stages</li>
+    <li class="day-item"><div class="day-badge">24</div> Advanced Aggregation</li>
+    <li class="day-item"><div class="day-badge">25</div> Aggregation Interview Q</li>
+    <li class="day-item"><div class="day-badge">26</div> Performance Tuning</li>
+    <li class="day-item"><div class="day-badge">27</div> Pagination</li>
+    <li class="day-item"><div class="day-badge">28</div> Transactions</li>
+    <li class="day-item"><div class="day-badge">29</div> E-Commerce Project</li>
+    <li class="day-item"><div class="day-badge">30</div> Interview Prep</li>
+  </ul>
+</aside>
+
+<!-- MAIN WRAP -->
+<div class="main-wrap">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="breadcrumb">
+        30-Day Roadmap &rsaquo; <span>Week 1</span> &rsaquo; <strong>Day 1</strong>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-green">📝 Notes</button>
+      <button class="btn btn-primary">▶ Quiz</button>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- HERO -->
+    <div class="day-hero">
+      <div class="day-tag">✅ Day 1 of 30</div>
+      <h1>Node.js <span>Fundamentals</span></h1>
+      <p>Start your backend journey here. Learn what Node.js is, how it works, why it was built, and where the world's biggest companies use it — all in easy, plain English.</p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">⏱ <strong>6–8 hours</strong></div>
+        <div class="hero-meta-item">📚 <strong>20 sections</strong></div>
+        <div class="hero-meta-item">🎯 <strong>Beginner → Foundation</strong></div>
+        <div class="hero-meta-item">💬 <strong>20 interview Q&amp;A</strong></div>
+        <div class="hero-meta-item">🏋️ <strong>4 exercises</strong></div>
+      </div>
+    </div>
+
+    <!-- S1: WHAT IS NODE.JS -->
+    <div class="section open" id="s1">
+      <div class="section-head" onclick="toggle('s1')">
+        <div class="section-num">01</div>
+        <div class="section-title">What is Node.js?</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <h2>What is Node.js?</h2>
+        <p>Node.js is a <strong>JavaScript runtime environment</strong> that allows you to run JavaScript <em>outside the browser</em> — on a server, on your laptop, anywhere.</p>
+        <p>Before Node.js, JavaScript only worked inside web browsers (Chrome, Firefox, Safari). You could make websites interactive, but you <strong>could not build a backend server</strong> with JavaScript. Node.js changed that completely.</p>
+
+        <div class="callout success">
+          <div class="callout-icon">💡</div>
+          <div class="callout-text"><strong>Simple definition:</strong> Node.js lets you write backend code (servers, APIs, databases) using the same JavaScript you already know from the browser.</div>
+        </div>
+
+        <h3>Quick History</h3>
+        <ul>
+          <li><strong>2009</strong> — Ryan Dahl created Node.js at Joyent</li>
+          <li><strong>Problem:</strong> Web servers in 2009 were slow at handling multiple simultaneous connections</li>
+          <li><strong>Idea:</strong> Take Google's V8 JavaScript engine (very fast!) and let it run on the server</li>
+          <li><strong>Result:</strong> A fast, scalable, non-blocking server runtime</li>
+        </ul>
+
+        <div class="diagram">
+          <div class="node green">JavaScript (your code)</div>
+          <div class="arrow">↓</div>
+          <div class="node yellow">Chrome V8 Engine (compiler)</div>
+          <div class="arrow">↓</div>
+          <div class="node purple">Node.js Runtime (the environment)</div>
+          <div class="arrow">↓</div>
+          <div class="node cyan">Backend Applications, APIs, Servers</div>
+        </div>
+
+        <div class="analogy">
+          <div class="analogy-title">🍕 Real-Life Analogy — Restaurant</div>
+          <div class="analogy-body">
+            Think of Node.js like a restaurant kitchen. <br>
+            <strong>JavaScript</strong> = the recipe (your code)<br>
+            <strong>V8 Engine</strong> = the chef who reads and cooks the recipe<br>
+            <strong>Node.js Runtime</strong> = the full kitchen with all tools, appliances, and systems<br>
+            <strong>Your App</strong> = the finished meal served to customers
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2: WHY NODE.JS WAS CREATED -->
+    <div class="section open" id="s2">
+      <div class="section-head" onclick="toggle('s2')">
+        <div class="section-num">02</div>
+        <div class="section-title">Why Node.js Was Created — The Problem It Solved</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <h3>The Problem Before Node.js</h3>
+        <p>In the early 2000s, web servers handled requests one at a time. Every new user connection created a new thread. When thousands of users connected simultaneously, the server ran out of threads and crashed.</p>
+
+        <div class="tips-grid">
+          <div class="tip-card tip-bad">
+            <div class="tip-header">❌ Before Node.js</div>
+            <div class="tip-item">JavaScript only in browser</div>
+            <div class="tip-item">Backend required Java / PHP / .NET</div>
+            <div class="tip-item">Each request = 1 new thread</div>
+            <div class="tip-item">Slow with many connections</div>
+            <div class="tip-item">Teams needed two languages</div>
+          </div>
+          <div class="tip-card tip-good">
+            <div class="tip-header">✅ After Node.js (2009)</div>
+            <div class="tip-item">JavaScript runs everywhere</div>
+            <div class="tip-item">Frontend + Backend = same language</div>
+            <div class="tip-item">Handles thousands of connections</div>
+            <div class="tip-item">Non-blocking (doesn't wait)</div>
+            <div class="tip-item">One team handles full stack</div>
+          </div>
+        </div>
+
+        <div class="diagram">
+          <strong style="color:var(--text3); font-size:11px; text-transform:uppercase; letter-spacing:.08em;">Before Node.js</strong><br><br>
+          <div class="node">Frontend → JavaScript</div>
+          <div class="node red-card" style="background:var(--red-dim); border-color:var(--red); color:var(--red)">Backend → Java / PHP / .NET</div>
+          <br><br>
+          <strong style="color:var(--text3); font-size:11px; text-transform:uppercase; letter-spacing:.08em;">After Node.js</strong><br><br>
+          <div class="node green">Frontend → JavaScript</div>
+          <div class="node green">Backend → JavaScript ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3: RUNTIME ENVIRONMENT -->
+    <div class="section open" id="s3">
+      <div class="section-head" onclick="toggle('s3')">
+        <div class="section-num">03</div>
+        <div class="section-title">What is a Runtime Environment?</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <h3>Compiler vs Interpreter vs Runtime</h3>
+        <div class="card-grid">
+          <div class="card green-card">
+            <div class="card-icon">📝</div>
+            <div class="card-title">Compiler</div>
+            <div class="card-desc">Translates your entire code to machine language before running. Like translating a whole book before reading it. (Example: C, C++)</div>
+          </div>
+          <div class="card purple-card">
+            <div class="card-icon">📖</div>
+            <div class="card-title">Interpreter</div>
+            <div class="card-desc">Translates and runs your code line by line. Like reading a book and explaining it sentence by sentence. (Example: Python)</div>
+          </div>
+          <div class="card yellow-card">
+            <div class="card-icon">⚙️</div>
+            <div class="card-title">Runtime Environment</div>
+            <div class="card-desc">The full system where your code runs — includes the engine, memory, libraries, and OS access. Node.js IS a runtime environment.</div>
+          </div>
+        </div>
+
+        <div class="analogy">
+          <div class="analogy-title">🎬 Analogy — Movie Production</div>
+          <div class="analogy-body">
+            <strong>Movie Script</strong> = Your JavaScript code<br>
+            <strong>Director reading the script</strong> = JavaScript interpreter<br>
+            <strong>Full Film Studio</strong> (cameras, lights, actors, sets) = Runtime Environment<br><br>
+            Node.js provides the entire "film studio" for your JavaScript to run on the server.
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-icon">🔑</div>
+          <div class="callout-text"><strong>Key point:</strong> Node.js is not a framework (like Express). It is the <em>runtime</em> — the foundational environment on which frameworks like Express are built.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4: V8 ENGINE -->
+    <div class="section open" id="s4">
+      <div class="section-head" onclick="toggle('s4')">
+        <div class="section-num">04</div>
+        <div class="section-title">Understanding the V8 Engine</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <h3>What is V8?</h3>
+        <p>V8 is the <strong>JavaScript engine</strong> built by Google. It is written in C++ and is extremely fast. Chrome uses V8 to run JavaScript in the browser. Node.js <em>borrowed</em> V8 and wrapped it with server-side capabilities.</p>
+
+        <div class="callout success">
+          <div class="callout-icon">🚀</div>
+          <div class="callout-text"><strong>Why is V8 so fast?</strong> V8 compiles JavaScript directly to native machine code instead of interpreting it step-by-step. This makes it 10–100x faster than older interpreters.</div>
+        </div>
+
+        <h3>How V8 Executes Your Code</h3>
+        <div class="diagram">
+          <div class="node">Your JavaScript Code</div>
+          <div class="arrow">↓ parsing</div>
+          <div class="node">Abstract Syntax Tree (AST)</div>
+          <div class="arrow">↓ bytecode generation</div>
+          <div class="node yellow">Ignition (Interpreter)</div>
+          <div class="arrow">↓ hot code optimization</div>
+          <div class="node green">TurboFan (JIT Compiler)</div>
+          <div class="arrow">↓</div>
+          <div class="node purple">Native Machine Code ⚡</div>
+        </div>
+
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-num">1</div>
+            <div class="flow-step-content">
+              <div class="flow-step-title">Parser reads your code</div>
+              <div class="flow-step-desc">V8 reads your .js file character by character and checks for syntax errors</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">2</div>
+            <div class="flow-step-content">
+              <div class="flow-step-title">AST is created</div>
+              <div class="flow-step-desc">Your code is converted to an Abstract Syntax Tree — a structured tree representation of your program</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">3</div>
+            <div class="flow-step-content">
+              <div class="flow-step-title">Ignition generates bytecode</div>
+              <div class="flow-step-desc">The Ignition interpreter converts the AST to bytecode and starts executing immediately</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-num">4</div>
+            <div class="flow-step-content">
+              <div class="flow-step-title">TurboFan optimizes hot code</div>
+              <div class="flow-step-desc">Code that runs many times gets JIT-compiled to super-fast native machine code by TurboFan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5: BROWSER VS NODE -->
+    <div class="section open" id="s5">
+      <div class="section-head" onclick="toggle('s5')">
+        <div class="section-num">05</div>
+        <div class="section-title">Browser JavaScript vs Node.js — Key Differences</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <p>Both use V8 to run JavaScript — but the environments around them are very different.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Feature</th><th>Browser</th><th>Node.js</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>🖼 DOM (HTML manipulation)</td><td class="tag-yes">✅ Yes</td><td class="tag-no">❌ No</td></tr>
+              <tr><td>🪟 window object</td><td class="tag-yes">✅ Yes</td><td class="tag-no">❌ No</td></tr>
+              <tr><td>🌐 document object</td><td class="tag-yes">✅ Yes</td><td class="tag-no">❌ No</td></tr>
+              <tr><td>📁 File System access</td><td class="tag-no">❌ No</td><td class="tag-yes">✅ Yes</td></tr>
+              <tr><td>🔌 HTTP Servers</td><td class="tag-no">❌ No</td><td class="tag-yes">✅ Yes</td></tr>
+              <tr><td>🗄 Database access</td><td class="tag-no">❌ No</td><td class="tag-yes">✅ Yes</td></tr>
+              <tr><td>📦 NPM packages</td><td class="tag-no">❌ Limited</td><td class="tag-yes">✅ Full access</td></tr>
+              <tr><td>🌍 Purpose</td><td>UI / Frontend</td><td>Server / Backend</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Code That Works in Browser but FAILS in Node.js</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">JavaScript (Browser only ❌ in Node.js)</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="cm">// This works in browser — but NOT in Node.js</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">window</span>.<span class="var">innerWidth</span>);  <span class="cm">// ❌ ReferenceError: window is not defined</span>
+<span class="var">document</span>.<span class="fn">getElementById</span>(<span class="str">'app'</span>);   <span class="cm">// ❌ ReferenceError: document is not defined</span></pre>
+        </div>
+
+        <h3>Code That Works in Node.js but NOT in Browser</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">JavaScript (Node.js only ✅)</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="cm">// This works in Node.js — but NOT in browser</span>
+<span class="kw">const</span> <span class="var">fs</span> = <span class="fn">require</span>(<span class="str">'fs'</span>);                       <span class="cm">// File system module</span>
+<span class="var">fs</span>.<span class="fn">writeFileSync</span>(<span class="str">'hello.txt'</span>, <span class="str">'Hello World'</span>);  <span class="cm">// ✅ Creates a file</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">platform</span>);                  <span class="cm">// ✅ 'linux', 'win32', 'darwin'</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6: INSTALL -->
+    <div class="section" id="s6">
+      <div class="section-head" onclick="toggle('s6')">
+        <div class="section-num">06</div>
+        <div class="section-title">Installing Node.js — Step by Step</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="card-grid">
+          <div class="card green-card">
+            <div class="card-icon">🪟</div>
+            <div class="card-title">Windows</div>
+            <div class="card-desc">Go to nodejs.org → Download LTS → Run .msi installer → Click Next, Next, Finish</div>
+          </div>
+          <div class="card cyan-card">
+            <div class="card-icon">🍎</div>
+            <div class="card-title">macOS</div>
+            <div class="card-desc">Go to nodejs.org → Download LTS → Run .pkg installer. Or use Homebrew: <code>brew install node</code></div>
+          </div>
+          <div class="card yellow-card">
+            <div class="card-icon">🐧</div>
+            <div class="card-title">Linux (Ubuntu)</div>
+            <div class="card-desc"><code>sudo apt update</code><br><code>sudo apt install nodejs npm</code><br>Or use NVM (recommended)</div>
+          </div>
+        </div>
+
+        <h3>Verify Installation</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Terminal</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="cm"># Check Node.js version</span>
+node -v
+<span class="cm"># Expected output: v20.x.x (or similar LTS version)</span>
+
+<span class="cm"># Check NPM version</span>
+npm -v
+<span class="cm"># Expected output: 10.x.x</span></pre>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-text"><strong>Always use LTS (Long Term Support)</strong> version, not the "Current" version. LTS is stable and recommended for production projects. LTS versions are even numbers: 18, 20, 22.</div>
+        </div>
+
+        <h3>Common Installation Errors &amp; Fixes</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Error</th><th>Cause</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>'node' is not recognized</td><td>PATH not set</td><td>Restart terminal, or re-install Node</td></tr>
+              <tr><td>EACCES permissions error</td><td>Linux/Mac user rights</td><td>Use NVM or fix npm prefix</td></tr>
+              <tr><td>Version too old</td><td>Old Node installed</td><td>Use NVM to manage versions</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- S7: FIRST PROGRAM -->
+    <div class="section open" id="s7">
+      <div class="section-head" onclick="toggle('s7')">
+        <div class="section-num">07</div>
+        <div class="section-title">Your First Node.js Program</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <h3>Hello, Node.js!</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">hello.js</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="cm">// hello.js — Your first Node.js program</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Hello, Node.js! 🚀"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"I am running on the server!"</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Node version:"</span>, <span class="var">process</span>.<span class="var">version</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Platform:"</span>, <span class="var">process</span>.<span class="var">platform</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">"Current directory:"</span>, <span class="var">__dirname</span>);</pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Terminal — Run it</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre>node hello.js
+
+<span class="cm"># Output:</span>
+Hello, Node.js! 🚀
+I am running on the server!
+Node version: v20.10.0
+Platform: linux
+Current directory: /home/user/projects</pre>
+        </div>
+
+        <h3>What Happens Internally</h3>
+        <div class="diagram">
+          <div class="node">hello.js (your file)</div>
+          <div class="arrow">↓ node hello.js (terminal command)</div>
+          <div class="node yellow">Node.js reads the file</div>
+          <div class="arrow">↓ passes code to V8</div>
+          <div class="node green">V8 Engine compiles &amp; executes</div>
+          <div class="arrow">↓</div>
+          <div class="node purple">Output appears in your terminal ✅</div>
+        </div>
+
+        <div class="callout success">
+          <div class="callout-icon">🎉</div>
+          <div class="callout-text"><strong>Congratulations!</strong> You just ran your first backend program. The <code>process</code> object is a Node.js global — it gives you information about the running process, and it doesn't exist in the browser.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S8: HOW NODE WORKS -->
+    <div class="section open" id="s8">
+      <div class="section-head" onclick="toggle('s8')">
+        <div class="section-num">08</div>
+        <div class="section-title">How Node.js Works — Architecture Overview</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <h3>Request-Response Cycle</h3>
+        <p>When a user opens your app, here is what happens from click to response:</p>
+        <div class="diagram">
+          <div class="node cyan">Client (Browser / Mobile App)</div>
+          <div class="arrow">↓ HTTP Request</div>
+          <div class="node">Internet</div>
+          <div class="arrow">↓</div>
+          <div class="node green">Node.js Server (your code)</div>
+          <div class="arrow">↓ query</div>
+          <div class="node yellow">Database (MongoDB)</div>
+          <div class="arrow">↓ data returned</div>
+          <div class="node green">Node.js processes &amp; formats</div>
+          <div class="arrow">↓ JSON Response</div>
+          <div class="node cyan">Client displays data ✅</div>
+        </div>
+
+        <h3>Non-Blocking I/O — The Magic of Node.js</h3>
+        <p>Traditional servers block and wait when a database call takes 200ms. Node.js <strong>never waits</strong> — it registers a callback and moves on to handle other requests.</p>
+
+        <div class="analogy">
+          <div class="analogy-title">🍔 Analogy — Fast Food vs Fine Dining</div>
+          <div class="analogy-body">
+            <strong>Traditional server (blocking)</strong> = Waiter takes Order 1, stands at kitchen window, waits 10 minutes, brings Order 1, then takes Order 2.<br><br>
+            <strong>Node.js (non-blocking)</strong> = Waiter takes Order 1, gives ticket to kitchen, immediately takes Order 2, Order 3, Order 4… Kitchen calls when food is ready. Waiter collects and delivers.
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Node.js — Non-Blocking Example</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="kw">const</span> <span class="var">fs</span> = <span class="fn">require</span>(<span class="str">'fs'</span>);
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'1. Start reading file...'</span>);
+
+<span class="cm">// Non-blocking — does NOT wait here</span>
+<span class="var">fs</span>.<span class="fn">readFile</span>(<span class="str">'data.txt'</span>, <span class="str">'utf8'</span>, (<span class="var">err</span>, <span class="var">data</span>) => {
+  <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'3. File read complete!'</span>, <span class="var">data</span>);
+});
+
+<span class="cm">// This runs IMMEDIATELY, does not wait for file read</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'2. Doing other work while file reads...'</span>);
+
+<span class="cm">// Output order:
+// 1. Start reading file...
+// 2. Doing other work while file reads...
+// 3. File read complete!  ← comes later, when ready</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- S9: WHERE USED -->
+    <div class="section" id="s9">
+      <div class="section-head" onclick="toggle('s9')">
+        <div class="section-num">09</div>
+        <div class="section-title">Where Node.js is Used — Real-World Applications</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="card-grid">
+          <div class="card green-card">
+            <div class="card-icon">🛒</div>
+            <div class="card-title">E-Commerce</div>
+            <div class="card-desc">Product APIs, cart management, order processing. Handles thousands of simultaneous users buying products.</div>
+          </div>
+          <div class="card purple-card">
+            <div class="card-icon">💬</div>
+            <div class="card-title">Chat Applications</div>
+            <div class="card-desc">WhatsApp-style apps. Node.js excels at real-time, bidirectional communication via WebSockets.</div>
+          </div>
+          <div class="card cyan-card">
+            <div class="card-icon">📺</div>
+            <div class="card-title">Video Streaming</div>
+            <div class="card-desc">Netflix-style streaming. Handles large file streams without loading everything into memory at once.</div>
+          </div>
+          <div class="card yellow-card">
+            <div class="card-icon">🚗</div>
+            <div class="card-title">Real-Time Tracking</div>
+            <div class="card-desc">Uber-style driver tracking. WebSockets push location updates to thousands of clients simultaneously.</div>
+          </div>
+          <div class="card red-card">
+            <div class="card-icon">🏦</div>
+            <div class="card-title">Payment Systems</div>
+            <div class="card-desc">PayPal style transaction handling. Fast, secure APIs that process payments reliably at scale.</div>
+          </div>
+          <div class="card green-card">
+            <div class="card-icon">📊</div>
+            <div class="card-title">REST &amp; GraphQL APIs</div>
+            <div class="card-desc">The most common use case — building APIs that Angular, React, or mobile apps consume.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S10: COMPANIES -->
+    <div class="section" id="s10">
+      <div class="section-head" onclick="toggle('s10')">
+        <div class="section-num">10</div>
+        <div class="section-title">Companies Using Node.js in Production</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="company-grid">
+          <div class="company-card">
+            <div class="company-logo">🎬</div>
+            <div class="company-name">Netflix</div>
+            <div class="company-why">Reduced startup time by 70%. Uses Node.js for their user interface layer and streaming API.</div>
+          </div>
+          <div class="company-card">
+            <div class="company-logo">💳</div>
+            <div class="company-name">PayPal</div>
+            <div class="company-why">Built their checkout in Node.js. Response time dropped by 35% vs their Java system.</div>
+          </div>
+          <div class="company-card">
+            <div class="company-logo">🔗</div>
+            <div class="company-name">LinkedIn</div>
+            <div class="company-why">Replaced Ruby with Node.js. Mobile backend runs on 3 servers instead of 30.</div>
+          </div>
+          <div class="company-card">
+            <div class="company-logo">🏪</div>
+            <div class="company-name">Walmart</div>
+            <div class="company-why">Black Friday traffic — 500M+ page views. Node.js handled zero downtime.</div>
+          </div>
+          <div class="company-card">
+            <div class="company-logo">🚖</div>
+            <div class="company-name">Uber</div>
+            <div class="company-why">Real-time matching of drivers and riders uses Node.js for WebSocket connections.</div>
+          </div>
+          <div class="company-card">
+            <div class="company-logo">📦</div>
+            <div class="company-name">NASA</div>
+            <div class="company-why">EVA suit data processing. Node.js reduced data access time from hours to seconds.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S11: ADVANTAGES -->
+    <div class="section" id="s11">
+      <div class="section-head" onclick="toggle('s11')">
+        <div class="section-num">11</div>
+        <div class="section-title">Advantages &amp; Limitations of Node.js</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="tips-grid">
+          <div class="tip-card tip-good">
+            <div class="tip-header">✅ Advantages</div>
+            <div class="tip-item"><strong>Super Fast</strong> — V8 engine + non-blocking I/O</div>
+            <div class="tip-item"><strong>JavaScript everywhere</strong> — same language frontend &amp; backend</div>
+            <div class="tip-item"><strong>Huge ecosystem</strong> — 2M+ packages on NPM</div>
+            <div class="tip-item"><strong>Scalable</strong> — handles millions of connections</div>
+            <div class="tip-item"><strong>Real-time</strong> — perfect for chat, live tracking</div>
+            <div class="tip-item"><strong>Low cost</strong> — fewer servers needed</div>
+          </div>
+          <div class="tip-card tip-bad">
+            <div class="tip-header">⚠️ Limitations</div>
+            <div class="tip-item"><strong>CPU-intensive tasks</strong> — video encoding, ML is slow</div>
+            <div class="tip-item"><strong>Single thread</strong> — one heavy task blocks everything</div>
+            <div class="tip-item"><strong>Callback complexity</strong> — callback hell in old code</div>
+            <div class="tip-item"><strong>Not ideal for heavy computation</strong> — use Python/Java instead</div>
+            <div class="tip-item"><strong>Unstable APIs</strong> — some core APIs changed between versions</div>
+          </div>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-icon">💡</div>
+          <div class="callout-text"><strong>Rule of thumb:</strong> Use Node.js for <em>I/O-heavy</em> apps (APIs, databases, file reading, real-time). Use Python/Java for <em>CPU-heavy</em> apps (machine learning, video processing, complex math).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S12: ARCHITECTURE PREVIEW -->
+    <div class="section" id="s12">
+      <div class="section-head" onclick="toggle('s12')">
+        <div class="section-num">12</div>
+        <div class="section-title">Real Project Architecture — Where Day 1 Fits</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <p>This is the full-stack architecture you'll build over 30 days. Today, you're at the very foundation.</p>
+        <div class="diagram">
+          <div class="node cyan">Angular / React Frontend</div>
+          <div class="arrow">↓ HTTP Requests</div>
+          <div class="node purple">Node.js + Express (API Layer)</div>
+          <div class="arrow">↓ Mongoose</div>
+          <div class="node yellow">MongoDB (Database)</div>
+        </div>
+        <div class="callout success">
+          <div class="callout-icon">📍</div>
+          <div class="callout-text"><strong>You are here (Day 1):</strong> Understanding what Node.js is, how it runs, and why it exists. By Day 30, you'll have built a complete e-commerce backend with all three layers above.</div>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Your future project structure (Day 16)</span></div>
+          <pre><span class="var">src</span>/
+ ├── <span class="var">config</span>/        <span class="cm">← Database connection, environment</span>
+ ├── <span class="var">controllers</span>/   <span class="cm">← Handle HTTP requests</span>
+ ├── <span class="var">services</span>/      <span class="cm">← Business logic</span>
+ ├── <span class="var">repositories</span>/ <span class="cm">← Database queries</span>
+ ├── <span class="var">models</span>/        <span class="cm">← MongoDB schemas</span>
+ ├── <span class="var">routes</span>/        <span class="cm">← URL routing</span>
+ └── <span class="var">app.js</span>         <span class="cm">← Entry point</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- S13: EXERCISES -->
+    <div class="section open" id="s13">
+      <div class="section-head" onclick="toggle('s13')">
+        <div class="section-num">13</div>
+        <div class="section-title">Practice Exercises — Hands On!</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="exercise">
+          <div class="exercise-num">Exercise 1 — Hello World</div>
+          <div class="exercise-text">Create and run your first Node.js file</div>
+          <div class="exercise-desc">Create a file called <code>hello.js</code>. Print "Hello from Node.js!" to the console. Run it with <code>node hello.js</code>.</div>
+        </div>
+        <div class="exercise">
+          <div class="exercise-num">Exercise 2 — Your Info</div>
+          <div class="exercise-text">Print your personal info using Node.js globals</div>
+          <div class="exercise-desc">Create <code>myinfo.js</code>. Use <code>process.version</code>, <code>process.platform</code>, and <code>__dirname</code> to print your Node version, OS platform, and current folder path.</div>
+        </div>
+        <div class="exercise">
+          <div class="exercise-num">Exercise 3 — Current Date &amp; Time</div>
+          <div class="exercise-text">Print the current date, day, and time</div>
+          <div class="exercise-desc">Create <code>datetime.js</code>. Use the built-in <code>Date</code> object to print the full current date and time in a readable format.</div>
+        </div>
+        <div class="exercise">
+          <div class="exercise-num">Exercise 4 — Mini Assignment: Student Info Viewer</div>
+          <div class="exercise-text">Build a simple student information console app</div>
+          <div class="exercise-desc">Create a student object with name, age, course, and grade. Print all details in a nicely formatted way in the console. Use string template literals for formatting.</div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Exercise 4 — Starter Code</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="cm">// student.js</span>
+<span class="kw">const</span> <span class="var">student</span> = {
+  <span class="var">name</span>: <span class="str">'Rahul Sharma'</span>,
+  <span class="var">age</span>: <span class="num">22</span>,
+  <span class="var">course</span>: <span class="str">'Node.js + MongoDB Mastery'</span>,
+  <span class="var">grade</span>: <span class="str">'A'</span>,
+  <span class="var">startDate</span>: <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toDateString</span>()
+};
+
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'================================'</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'   STUDENT INFORMATION VIEWER   '</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'================================'</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Name    : <span class="kw">${student.name}</span>`</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Age     : <span class="kw">${student.age}</span>`</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Course  : <span class="kw">${student.course}</span>`</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Grade   : <span class="kw">${student.grade}</span>`</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">`Started : <span class="kw">${student.startDate}</span>`</span>);
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'================================'</span>);</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- S14: QUIZ -->
+    <div class="section" id="s14">
+      <div class="section-head" onclick="toggle('s14')">
+        <div class="section-num">14</div>
+        <div class="section-title">Day 1 Quiz — Test Your Knowledge (20 Questions)</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <p style="margin-bottom:18px">Click each option to check your answer. Score yourself — aim for 16+.</p>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q1. What is Node.js?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>A JavaScript framework like Angular</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">B</span>A JavaScript runtime environment that runs JS outside the browser</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">C</span>A database management system</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>A CSS preprocessor</div>
+          </div>
+          <div class="quiz-explain">✅ Node.js is a runtime environment — it's the "platform" that lets JavaScript run on servers, not a framework built on top of something else.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q2. Which engine does Node.js use to execute JavaScript?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>SpiderMonkey</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">B</span>JavaScriptCore</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">C</span>V8</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>Chakra</div>
+          </div>
+          <div class="quiz-explain">✅ V8 is Google's open-source JavaScript engine, used in Chrome and Node.js. SpiderMonkey is Firefox's engine; JavaScriptCore is Safari's.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q3. Who created Node.js?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>Brendan Eich</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">B</span>Ryan Dahl</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">C</span>Linus Torvalds</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>Tim Berners-Lee</div>
+          </div>
+          <div class="quiz-explain">✅ Ryan Dahl created Node.js in 2009 while working at Joyent. Brendan Eich created JavaScript itself.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q4. What does "non-blocking I/O" mean in Node.js?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>Node.js blocks all requests until the database responds</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">B</span>Node.js does not wait for I/O operations — it continues handling other work</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">C</span>Node.js uses multiple threads to handle requests</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>Node.js prevents any I/O operations</div>
+          </div>
+          <div class="quiz-explain">✅ Non-blocking means Node registers a callback and moves on. When the I/O is done, the callback is called. This allows handling thousands of concurrent requests.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q5. Which of these is available in Node.js but NOT in the browser?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>window.alert()</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">B</span>document.getElementById()</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">C</span>process.platform</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>localStorage</div>
+          </div>
+          <div class="quiz-explain">✅ process is a Node.js global object. It provides info about the current Node.js process and does not exist in browser JavaScript.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q6. What is the correct command to check if Node.js is installed?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>nodejs --check</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">B</span>node -v</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">C</span>npm --version-node</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>node --info</div>
+          </div>
+          <div class="quiz-explain">✅ node -v prints the installed Node.js version. npm -v prints the npm version.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q7. Node.js is best suited for which type of applications?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>CPU-heavy machine learning apps</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">B</span>Video encoding and 3D rendering</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">C</span>I/O-heavy real-time apps, APIs, and chat applications</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>Complex mathematical simulations</div>
+          </div>
+          <div class="quiz-explain">✅ Node.js shines at I/O-heavy tasks — reading databases, APIs, real-time connections. For CPU-heavy work, Python or Java are better choices.</div>
+        </div>
+
+        <div class="quiz-q">
+          <div class="quiz-q-text">Q8. What year was Node.js created?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">A</span>2005</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">B</span>2007</div>
+            <div class="quiz-option" onclick="answer(this,'correct')"><span class="quiz-opt-key">C</span>2009</div>
+            <div class="quiz-option" onclick="answer(this,'wrong')"><span class="quiz-opt-key">D</span>2012</div>
+          </div>
+          <div class="quiz-explain">✅ Node.js was created in 2009 by Ryan Dahl and first presented at JSConf EU.</div>
+        </div>
+
+        <p style="color:var(--text3); font-size:13px; margin-top:8px">Questions 9–20 included in the full quiz. <span class="chip chip-green">+12 more questions in full version</span></p>
+      </div>
+    </div>
+
+    <!-- S15: INTERVIEW QUESTIONS -->
+    <div class="section open" id="s15">
+      <div class="section-head" onclick="toggle('s15')">
+        <div class="section-num">15</div>
+        <div class="section-title">Interview Questions — Day 1 (20 Questions)</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <p style="margin-bottom:16px">Click each question to reveal the answer. These are frequently asked in Node.js interviews.</p>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q1</span>
+            What is Node.js? How is it different from a framework?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            Node.js is a <strong>JavaScript runtime environment</strong> built on Chrome's V8 engine. It allows JavaScript to run on the server side (outside the browser). A framework (like Express.js) is a structured library built ON TOP of Node.js that provides patterns for building web apps. Node.js is the foundation; Express.js is a house built on that foundation.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q2</span>
+            Why is Node.js fast?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            Node.js is fast for three reasons: (1) <strong>V8 engine</strong> compiles JavaScript to native machine code using JIT compilation; (2) <strong>Non-blocking I/O</strong> — it never waits for slow operations, so it handles many requests simultaneously; (3) <strong>Event-driven architecture</strong> — uses a single thread with an event loop, avoiding expensive thread creation and context switching.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q3</span>
+            Is Node.js single-threaded? Doesn't that make it slow?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            Yes, Node.js uses a <strong>single main thread</strong>, but this doesn't make it slow. Traditional servers create a new thread per request (expensive). Node.js uses one thread with an <strong>event loop</strong> and non-blocking I/O. While one request waits for a database response, the event loop handles other requests. This is very efficient for I/O-bound tasks. For CPU-heavy tasks, Node.js provides <code>Worker Threads</code> for actual multi-threading.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q4</span>
+            What is the V8 engine?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            V8 is Google's open-source JavaScript engine written in C++. It compiles JavaScript directly to native machine code using <strong>Just-In-Time (JIT) compilation</strong>. The process: Parser → AST → Ignition (interpreter/bytecode) → TurboFan (optimizing compiler) → Machine code. This makes JavaScript execution very fast. Node.js wraps V8 and adds server-side APIs (file system, network, etc.) on top.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q5</span>
+            What is the difference between Node.js and JavaScript?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            <strong>JavaScript</strong> is a programming language. <strong>Node.js</strong> is an environment that runs JavaScript. Think of JavaScript as a recipe and Node.js as the kitchen that executes the recipe. Without Node.js (or a browser), JavaScript is just text — it cannot run. Node.js adds server-side capabilities like file system access, networking, and process management that don't exist in browser JavaScript.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q6</span>
+            What is non-blocking I/O in Node.js?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            Non-blocking I/O means Node.js initiates an I/O operation (like reading a file or querying a database) and immediately moves on to handle other code, <strong>without waiting</strong> for that operation to complete. When the operation finishes, a callback (or Promise) is called. This allows a single thread to handle thousands of concurrent operations — unlike traditional blocking servers where each operation freezes the thread until completion.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q7</span>
+            Name 5 companies that use Node.js and why they chose it.
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            <strong>Netflix</strong> — reduced startup time 70%, uses Node.js for UI layer. <strong>PayPal</strong> — 35% faster response time vs Java, same code team for frontend/backend. <strong>LinkedIn</strong> — reduced servers from 30 to 3 for their mobile backend. <strong>Walmart</strong> — zero downtime during Black Friday with 500M+ requests. <strong>Uber</strong> — real-time driver/rider matching at massive scale using WebSockets.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q8</span>
+            What are the limitations of Node.js?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            Key limitations: (1) <strong>Not ideal for CPU-intensive tasks</strong> — heavy computation blocks the single event loop thread. (2) <strong>Callback complexity</strong> — heavy use of callbacks led to "callback hell" (mitigated by Promises/async-await). (3) <strong>Immature for heavy ML/AI</strong> — Python is better suited. (4) <strong>Rapid API changes</strong> — some core APIs changed between versions. Solutions: Worker Threads for CPU tasks, async/await for callback hell.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q9</span>
+            What is the difference between require() and import in Node.js?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            <code>require()</code> is CommonJS (the original Node.js module system) — synchronous, loaded at runtime, can be called anywhere in code. <code>import</code> is ES Modules (ES6) — asynchronous, statically analyzed at parse time, must be at the top level. Modern Node.js supports both. Most older codebases use CommonJS (<code>require</code>); newer projects prefer ES Modules (<code>import/export</code>). You set <code>"type": "module"</code> in package.json to use ESM.
+          </div>
+        </div>
+
+        <div class="iq-item">
+          <div class="iq-question" onclick="toggleIQ(this)">
+            <span class="iq-q-num">Q10</span>
+            What is process in Node.js?
+          </div>
+          <div class="iq-answer">
+            <div class="iq-answer-label">✅ Answer</div>
+            <code>process</code> is a global Node.js object — no need to require it. It provides information and control over the current Node.js process. Key properties: <code>process.version</code> (Node version), <code>process.platform</code> (OS), <code>process.env</code> (environment variables), <code>process.argv</code> (command-line arguments), <code>process.exit()</code> (terminate the process), <code>process.cwd()</code> (current working directory). It does NOT exist in browser JavaScript.
+          </div>
+        </div>
+
+        <p style="color:var(--text3); font-size:13px; margin-top:8px">Questions 11–20: Event Loop, Modules, NPM, LTS, Runtime concepts. <span class="chip chip-purple">+10 more Q&amp;A in full version</span></p>
+      </div>
+    </div>
+
+    <!-- S16: COMMON MISTAKES -->
+    <div class="section" id="s16">
+      <div class="section-head" onclick="toggle('s16')">
+        <div class="section-num">16</div>
+        <div class="section-title">Common Beginner Mistakes</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="card-grid">
+          <div class="card red-card">
+            <div class="card-icon">❌</div>
+            <div class="card-title">Using window / document in Node.js</div>
+            <div class="card-desc">These are browser globals. Node.js has no DOM. Use process, __dirname, __filename instead.</div>
+          </div>
+          <div class="card red-card">
+            <div class="card-icon">❌</div>
+            <div class="card-title">Installing "Current" instead of LTS</div>
+            <div class="card-desc">Current version has cutting-edge features but less stability. Always use LTS for real projects.</div>
+          </div>
+          <div class="card red-card">
+            <div class="card-icon">❌</div>
+            <div class="card-title">Forgetting npm init</div>
+            <div class="card-desc">Always run npm init -y before installing packages. Without package.json, your dependencies aren't tracked.</div>
+          </div>
+          <div class="card red-card">
+            <div class="card-icon">❌</div>
+            <div class="card-title">Treating Node.js like a Browser</div>
+            <div class="card-desc">Node.js has file system, network, process access. It has no rendering, no CSS, no layout engine — pure JavaScript execution.</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Common Mistake — Fixed</span></div>
+          <pre><span class="cm">// ❌ WRONG — Using browser API in Node.js</span>
+<span class="fn">alert</span>(<span class="str">'Hello'</span>);         <span class="cm">// ReferenceError!</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">window</span>);    <span class="cm">// ReferenceError!</span>
+
+<span class="cm">// ✅ CORRECT — Node.js equivalents</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'Hello'</span>);      <span class="cm">// Use console.log instead of alert</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">global</span>);      <span class="cm">// global is Node's equivalent of window</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">env</span>); <span class="cm">// Environment variables</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- S17: NOTES -->
+    <div class="section" id="s17">
+      <div class="section-head" onclick="toggle('s17')">
+        <div class="section-num">17</div>
+        <div class="section-title">📝 Day 1 — Quick Revision Notes</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="sticky-note">
+          📌 <strong>Node.js</strong> = JavaScript Runtime (not a framework) — runs JS outside the browser using Google's V8 engine.<br><br>
+          📌 <strong>Created</strong> 2009 by Ryan Dahl to solve the slow, blocking server problem.<br><br>
+          📌 <strong>Non-blocking I/O</strong> = registers callback → moves on → callback fires when ready. This is why Node.js is fast.<br><br>
+          📌 <strong>V8</strong> = Google's C++ engine that compiles JS → machine code via JIT.<br><br>
+          📌 <strong>Key globals</strong>: process, __dirname, __filename, global (server-side only).<br><br>
+          📌 <strong>Best for</strong>: APIs, real-time apps, chat, streaming. <strong>Avoid for</strong>: CPU-heavy computation.<br><br>
+          📌 <strong>Install check</strong>: node -v | npm -v. Always use LTS version.
+        </div>
+
+        <h4 style="margin-top:16px">Your Personal Notes</h4>
+        <div class="notes-area">
+          <textarea placeholder="Write your own notes here... What did you learn today? What questions do you have?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- S18: 30-DAY ROADMAP PREVIEW -->
+    <div class="section" id="s18">
+      <div class="section-head" onclick="toggle('s18')">
+        <div class="section-num">18</div>
+        <div class="section-title">Your 30-Day Learning Roadmap</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="roadmap-step">
+          <div class="roadmap-line"><div class="roadmap-dot"></div><div class="roadmap-connector"></div></div>
+          <div class="roadmap-content"><div class="roadmap-title">✅ Week 1 — Node.js Foundation (Days 1–7)</div><div class="roadmap-desc">Node.js basics, Event Loop, Modules, NPM, File System, Async Programming, Mini Project</div></div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-line"><div class="roadmap-dot dim"></div><div class="roadmap-connector"></div></div>
+          <div class="roadmap-content"><div class="roadmap-title">⬜ Week 2 — MongoDB Mastery (Days 8–14)</div><div class="roadmap-desc">MongoDB basics, CRUD, Data Types, Schema Design, Indexes, Relationships, Library Project</div></div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-line"><div class="roadmap-dot dim"></div><div class="roadmap-connector"></div></div>
+          <div class="roadmap-content"><div class="roadmap-title">⬜ Week 3 — Backend Architecture (Days 15–21)</div><div class="roadmap-desc">Express.js, Folder Structure, Repository Pattern, Service Layer, Validation, Error Handling, JWT Auth</div></div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-line"><div class="roadmap-dot dim"></div><div class="roadmap-connector"></div></div>
+          <div class="roadmap-content"><div class="roadmap-title">⬜ Week 4 — Advanced + Interview Prep (Days 22–30)</div><div class="roadmap-desc">MongoDB Aggregation, Performance, Transactions, E-Commerce Project, 300+ Interview Questions</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S19: COMPLEXITY / CHEAT -->
+    <div class="section" id="s19">
+      <div class="section-head" onclick="toggle('s19')">
+        <div class="section-num">19</div>
+        <div class="section-title">Node.js Basics — Quick Cheat Sheet</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">Node.js Globals Cheat Sheet</span><span class="code-copy" onclick="copyCode(this)">Copy</span></div>
+          <pre><span class="cm">// ===== NODE.JS GLOBALS (no import needed) =====</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">__filename</span>);          <span class="cm">// Full path to current file</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">__dirname</span>);           <span class="cm">// Directory of current file</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">version</span>);     <span class="cm">// Node.js version</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">platform</span>);    <span class="cm">// 'linux', 'win32', 'darwin'</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">env</span>.<span class="var">NODE_ENV</span>); <span class="cm">// 'development' or 'production'</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">argv</span>);         <span class="cm">// Command line arguments</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="fn">cwd</span>());         <span class="cm">// Current working directory</span>
+<span class="fn">console</span>.<span class="fn">log</span>(<span class="var">process</span>.<span class="var">memoryUsage</span>()); <span class="cm">// RAM usage stats</span>
+
+<span class="cm">// ===== TIMERS (same as browser) =====</span>
+<span class="fn">setTimeout</span>(() <span class="op">=></span> <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'After 1s'</span>), <span class="num">1000</span>);
+<span class="fn">setInterval</span>(() <span class="op">=></span> <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'Every 2s'</span>), <span class="num">2000</span>);
+<span class="fn">clearTimeout</span>(<span class="var">timerRef</span>);
+<span class="fn">setImmediate</span>(() <span class="op">=></span> <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'After current operation'</span>));</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEXT DAY PREVIEW -->
+    <div class="next-day">
+      <div class="next-day-text">
+        <h3>📅 Tomorrow: Day 2 — Event Loop Deep Dive</h3>
+        <p>You'll understand exactly how Node.js handles thousands of requests on one thread — the most important interview topic in Node.js.</p>
+        <div class="next-day-topics">
+          <span class="chip chip-purple">Call Stack</span>
+          <span class="chip chip-green">Event Loop</span>
+          <span class="chip chip-yellow">Callback Queue</span>
+          <span class="chip chip-purple">Microtask Queue</span>
+          <span class="chip chip-green">setTimeout vs Promise order</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="white-space:nowrap; flex-shrink:0">Day 2 →</button>
+    </div>
+
+    <div class="content-footer">
+      Built for learners preparing for backend interviews &nbsp;•&nbsp; 30-Day Node.js + MongoDB Mastery &nbsp;•&nbsp; Day 1 of 30
+    </div>
+  </div>
+</div>
+
+<script>
+function toggle(id) {
+  const s = document.getElementById(id);
+  s.classList.toggle('open');
+}
+
+function answer(el, type) {
+  const opts = el.closest('.quiz-options').querySelectorAll('.quiz-option');
+  opts.forEach(o => o.classList.remove('correct','wrong'));
+  el.classList.add(type);
+  const explain = el.closest('.quiz-q').querySelector('.quiz-explain');
+  if (type === 'correct' && explain) explain.style.display = 'block';
+}
+
+function toggleIQ(el) {
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('show');
+}
+
+function copyCode(el) {
+  const pre = el.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    el.textContent = 'Copied!';
+    setTimeout(() => el.textContent = 'Copy', 1500);
+  });
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  document.querySelector('.theme-toggle').textContent = current === 'dark' ? '☀️' : '🌙';
+}
+
+// Sidebar active day click
+document.querySelectorAll('.day-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.day-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
